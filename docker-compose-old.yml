@@ -1,0 +1,63 @@
+﻿version: "3.3"
+name: "commend-ca-demo"
+
+services:
+
+  sql-server-db:
+    container_name: sql-server-ccd
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    ports:
+      - "1433:1433"
+    environment:
+      SA_PASSWORD: "str0ngp@ssword"
+      ACCEPT_EULA: "Y"
+    volumes:
+      - ccd_sql_data:/home/sql/data
+
+
+  rabbitmq:
+    container_name: rabbitmq-ccd
+    image: rabbitmq:3-management
+    restart: unless-stopped
+    ports:
+      - 5672:5672
+      - 15672:15672
+    volumes:
+      - ccd_rabbitmq_data:/home/rabbitmq/data
+   
+
+  jaeger:
+    image: jaegertracing/all-in-one
+    container_name: jaeger-ccd
+    restart: unless-stopped
+    ports:
+      - 5775:5775/udp
+      - 6831:6831/udp
+      - 6832:6832/udp
+      - 5778:5778
+      - 16686:16686
+      - 14250:14250
+      - 14268:14268
+      - 14269:14269
+      - 4317:4317
+      - 4318:4318
+      - 9411:9411
+    environment:
+      COLLECTOR_OTLP_ENABLED: true
+
+
+  seq:
+    image: datalust/seq:latest
+    container_name: seq-ccd
+    ports:
+      - '5341:80'
+    environment:
+      - ACCEPT_EULA=Y
+    volumes:
+      - ccd_seq_data:/home/seq/data
+
+
+volumes:
+  ccd_sql_data:
+  ccd_rabbitmq_data:
+  ccd_seq_data:

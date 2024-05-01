@@ -1,0 +1,27 @@
+﻿version: '3.4'
+name: "argo-ca-demo"
+
+services:
+
+  sql-server-db:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+
+  rabbitmq:
+    image: rabbitmq:3-management
+
+  jaeger:
+    image: jaegertracing/all-in-one
+
+  seq:
+    image: datalust/seq:latest
+
+  api:
+    image: ${DOCKER_REGISTRY-}argocacompanyapi
+    build:
+      context: .
+      dockerfile: src/Api/Dockerfile
+
+volumes:
+  acd_sql_data:
+  acd_rabbitmq_data:
+  acd_seq_data:

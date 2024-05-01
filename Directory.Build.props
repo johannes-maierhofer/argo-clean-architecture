@@ -1,0 +1,11 @@
+﻿<Project>
+  <PropertyGroup>
+    <TargetFrameworkVersion>net8.0</TargetFrameworkVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <RestorePackagesWithLockFile>false</RestorePackagesWithLockFile>
+	<AssemblyName>Argo.CA.$(MSBuildProjectName)</AssemblyName>
+    <RootNamespace>Argo.CA.$(MSBuildProjectName)</RootNamespace>
+  </PropertyGroup>
+</Project>
