@@ -43,3 +43,13 @@ Clean architecture demo application with
 - [Use These 4 Best Practices For Your .NET Project Setup](https://www.youtube.com/watch?v=B9ZUJN1Juhk)
 - [ASP.NET 6 REST API Following CLEAN ARCHITECTURE & DDD Tutorial - by Amichai Mantinband (full series of videos)](https://www.youtube.com/watch?v=fhM0V2N1GpY&list=PLzYkqgWkHPKBcDIP5gzLfASkQyTdy0t4k)
 - [Domain-Driven Design - by Amichai Mantinband (series of videos)](https://www.youtube.com/watch?v=8Z5IAkWcnIw&list=PLzYkqgWkHPKDpXETRRsFv2F9ht6XdAF3v)
+
+## Adding a EF Core migration
+
+Add-Migration [MigrationName] -OutputDir Persistence/Migrations
+
+## Temporary Sample login
+{
+  "email": "admin@argo-ca.com",
+  "password": "Admin1!"
+}

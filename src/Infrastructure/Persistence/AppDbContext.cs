@@ -1,11 +1,14 @@
 ﻿namespace Argo.CA.Infrastructure.Persistence
 {
     using Application.Common.Persistence;
+    using Identity;
     using Domain.CompanyAggregate;
+    using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore;
 
+    // TODO: get rid of ITransactionalDbContext
     public class AppDbContext(DbContextOptions<AppDbContext> options)
-        : DbContext(options), IAppDbContext, ITransactionalDbContext
+        : IdentityDbContext<ApplicationUser>(options), IAppDbContext, ITransactionalDbContext
     {
         public DbSet<Company> Companies => Set<Company>();
         

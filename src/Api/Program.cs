@@ -1,7 +1,7 @@
 ﻿using Argo.CA.Api;
-using Argo.CA.Api.Infrastructure.ExceptionHandling;
 using Argo.CA.Application;
 using Argo.CA.Infrastructure;
+using Argo.CA.Infrastructure.Identity;
 using Argo.CA.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,6 +13,10 @@ builder.Services
     .AddApiServices();
 
 var app = builder.Build();
+
+app.MapGroup("/identity")
+    .MapIdentityApi<ApplicationUser>()
+    .WithTags("Identity");
 
 // TODO: in what environments should the DB be migrated
 if (app.Environment.IsDevelopment())
@@ -28,10 +32,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseAuthentication();
 app.UseAuthorization();
-
-app.UseCustomExceptionHandlers();
+app.UseExceptionHandler(_ => { });
 
 app.MapControllers();
 

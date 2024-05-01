@@ -1,9 +1,13 @@
-﻿namespace Argo.CA.Infrastructure;
+﻿using Argo.CA.Infrastructure.Identity;
+
+namespace Argo.CA.Infrastructure;
 
 using Application.Common.Persistence;
 using Ardalis.GuardClauses;
+using Application.Common.Authorization;
 using Domain.Common.Events;
 using Logging;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
@@ -21,7 +25,10 @@ public static class DependencyInjection
         IConfiguration configuration,
         IHostEnvironment environment)
     {
-        services.AddPersistence(configuration);
+        services
+            .AddHttpContextAccessor()
+            .AddPersistence(configuration)
+            .AddAuth();
 
         if (!environment.IsEnvironment("Testing"))
         {
@@ -56,6 +63,28 @@ public static class DependencyInjection
         services.AddScoped<IAppDbContext>(sp => sp.GetRequiredService<AppDbContext>());
         services.AddScoped<ITransactionalDbContext>(sp => sp.GetRequiredService<AppDbContext>());
         services.AddScoped<AppDbContextInitializer>();
+
+        return services;
+    }
+
+    private static IServiceCollection AddAuth(this IServiceCollection services)
+    {
+        services.AddAuthentication()
+            .AddBearerToken(IdentityConstants.BearerScheme);
+
+        services.AddAuthorizationBuilder();
+
+        services
+            .AddIdentityCore<ApplicationUser>()
+            .AddRoles<IdentityRole>()
+            .AddEntityFrameworkStores<AppDbContext>()
+            .AddApiEndpoints();
+
+        services.AddTransient<IIdentityService, IdentityService>();
+        
+        // TODO: add policies
+        //services.AddAuthorization(options =>
+        //    options.AddPolicy(Policies.CanPurge, policy => policy.RequireRole(Roles.Administrator)));
 
         return services;
     }

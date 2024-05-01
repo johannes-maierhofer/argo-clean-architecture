@@ -16,12 +16,9 @@ public static class DependencyInjection
         // TODO: do not user DummyCurrentUserService once Authentication is implemented
         services.AddScoped<ICurrentUserService, DummyCurrentUserService>();
 
-        services.AddHttpContextAccessor();
-
-        //services.AddHealthChecks()
-        //    .AddDbContextCheck<ApplicationDbContext>();
-
-        services.AddCustomExceptionHandlers();
+        services
+            .AddExceptionHandlers()
+            .AddSwagger();
 
         services.AddControllers();
         
@@ -29,15 +26,54 @@ public static class DependencyInjection
         services.Configure<ApiBehaviorOptions>(options =>
             options.SuppressModelStateInvalidFilter = true);
 
+        services.AddEndpointsApiExplorer();
+
+        return services;
+    }
+
+    private static IServiceCollection AddExceptionHandlers(this IServiceCollection services)
+    {
+        // the order is important, do not change!!!
+        services.AddExceptionHandler<LoggingExceptionHandler>();
+        services.AddExceptionHandler<CustomExceptionHandler>();
+
+        return services;
+    }
+
+    private static IServiceCollection AddSwagger(this IServiceCollection services)
+    {
         services.AddSwaggerGen(c =>
         {
-            c.SwaggerDoc("v1", new OpenApiInfo { Title = "Company API", Version = "v1" });
+            c.SwaggerDoc("v1", new OpenApiInfo { Title = "CA API", Version = "v1" });
             c.EnableAnnotations();
             c.SupportNonNullableReferenceTypes();
             c.CustomOperationIds(apiDesc => apiDesc.TryGetMethodInfo(out MethodInfo methodInfo) ? methodInfo.Name : null);
-        });
 
-        services.AddEndpointsApiExplorer();
+            c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                In = ParameterLocation.Header,
+                Description = "Please enter token",
+                Name = "Authorization",
+                Type = SecuritySchemeType.Http,
+                BearerFormat = "JWT",
+                Scheme = "bearer"
+            });
+
+            c.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type=ReferenceType.SecurityScheme,
+                            Id="Bearer"
+                        }
+                    },
+                    new string[]{}
+                }
+            });
+        });
 
         return services;
     }

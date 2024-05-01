@@ -2,6 +2,7 @@
 
 using Microsoft.AspNetCore.Http;
 
+// TODO: properly implement CurrentUserService/IUser (see Mantinband CA)
 public class CurrentUserService(IHttpContextAccessor httpContextAccessor) : ICurrentUserService
 {
     public string GetName()
