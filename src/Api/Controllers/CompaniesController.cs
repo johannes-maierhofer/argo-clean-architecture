@@ -15,7 +15,7 @@ using DotSwashbuckle.AspNetCore.Annotations;
 public class CompaniesController(ISender mediator, IMapper mapper) : ControllerBase
 {
     [HttpPost]
-    [SwaggerOperation(Summary = "Create company")]
+    [SwaggerOperation(OperationId = "CreateCompany", Summary = "Create company")]
     [SwaggerResponse(201, "The company was created", typeof(CreateCompanyResponse))]
     [SwaggerResponse(400, "The company data is invalid", typeof(ValidationProblemDetails))]
     [SwaggerResponse(401)]
@@ -42,7 +42,7 @@ public class CompaniesController(ISender mediator, IMapper mapper) : ControllerB
 
     [HttpPut]
     [Route("{companyId:guid}")]
-    [SwaggerOperation(Summary = "Update company")]
+    [SwaggerOperation(OperationId = "UpdateCompany", Summary = "Update company")]
     [SwaggerResponse(204)]
     [SwaggerResponse(400, "The company data is invalid", typeof(ValidationProblemDetails))]
     [SwaggerResponse(404, "The company was not found", typeof(ProblemDetails))]
@@ -66,7 +66,7 @@ public class CompaniesController(ISender mediator, IMapper mapper) : ControllerB
     }
 
     [HttpGet]
-    [SwaggerOperation(Summary = "Get company list")]
+    [SwaggerOperation(OperationId = "GetCompanyList", Summary = "Get company list")]
     [SwaggerResponse(200, "Success", typeof(GetCompanyListResponse))]
     [SwaggerResponse(401)]
     public async Task<IActionResult> GetCompanyList([FromQuery] GetCompanyListRequest request, CancellationToken cancellationToken)
@@ -86,7 +86,7 @@ public class CompaniesController(ISender mediator, IMapper mapper) : ControllerB
 
     [HttpGet]
     [Route("{companyId:guid}")]
-    [SwaggerOperation(Summary = "Get company details")]
+    [SwaggerOperation(OperationId = "GetCompanyDetails", Summary = "Get company details")]
     [SwaggerResponse(200, "Success", typeof(GetCompanyDetailsResponse))]
     [SwaggerResponse(404, "The company was not found", typeof(ProblemDetails))]
     [SwaggerResponse(401)]

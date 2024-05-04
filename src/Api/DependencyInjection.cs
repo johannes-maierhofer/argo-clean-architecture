@@ -1,15 +1,15 @@
 ﻿namespace Argo.CA.Api;
 
-using System.Reflection;
 using Application.Common.Authorization;
 using Infrastructure.ExceptionHandling;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
-using DotSwashbuckle.AspNetCore.SwaggerGen;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddApiServices(this IServiceCollection services)
+    public static IServiceCollection AddApiServices(
+        this IServiceCollection services,
+        IHostEnvironment environment)
     {
         services.AddAutoMapper(typeof(Program));
 
@@ -18,7 +18,7 @@ public static class DependencyInjection
 
         services
             .AddExceptionHandlers()
-            .AddSwagger();
+            .AddCustomSwaggerGen(environment);
 
         services.AddControllers();
         
@@ -40,14 +40,21 @@ public static class DependencyInjection
         return services;
     }
 
-    private static IServiceCollection AddSwagger(this IServiceCollection services)
+    private static IServiceCollection AddCustomSwaggerGen(
+        this IServiceCollection services,
+        IHostEnvironment environment)
     {
         services.AddSwaggerGen(c =>
         {
             c.SwaggerDoc("v1", new OpenApiInfo { Title = "CA API", Version = "v1" });
             c.EnableAnnotations();
             c.SupportNonNullableReferenceTypes();
-            c.CustomOperationIds(apiDesc => apiDesc.TryGetMethodInfo(out MethodInfo methodInfo) ? methodInfo.Name : null);
+
+            if (environment.IsEnvironment("SwaggerBuild"))
+            {
+                // ignore identity endpoints in the generated swagger.json
+                c.DocInclusionPredicate((_, apiDesc) => !(apiDesc.RelativePath?.StartsWith("identity") ?? false));
+            }
 
             c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
