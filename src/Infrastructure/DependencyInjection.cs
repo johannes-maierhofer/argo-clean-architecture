@@ -1,22 +1,21 @@
-﻿using Argo.CA.Infrastructure.Identity;
-
-namespace Argo.CA.Infrastructure;
-
-using Application.Common.Persistence;
-using Ardalis.GuardClauses;
-using Application.Common.Authorization;
-using Domain.Common.Events;
-using Logging;
+﻿using Ardalis.GuardClauses;
+using Argo.CA.Application.Common.Auth;
+using Argo.CA.Application.Common.Persistence;
+using Argo.CA.Domain.Common.Events;
+using Argo.CA.Infrastructure.Identity;
+using Argo.CA.Infrastructure.Logging;
+using Argo.CA.Infrastructure.OpenTelemetry;
+using Argo.CA.Infrastructure.Persistence;
+using Argo.CA.Infrastructure.Persistence.Interceptors;
+using Argo.CA.Infrastructure.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Persistence;
-using Persistence.Interceptors;
-using Services;
-using Tracing;
+
+namespace Argo.CA.Infrastructure;
 
 public static class DependencyInjection
 {
@@ -28,14 +27,9 @@ public static class DependencyInjection
         services
             .AddHttpContextAccessor()
             .AddPersistence(configuration)
-            .AddAuth();
-
-        if (!environment.IsEnvironment("Testing"))
-        {
-            services
-                .AddCustomSerilog()
-                .AddCustomOpenTelemetry();
-        }
+            .AddAuth()
+            .AddCustomSerilog()
+            .AddCustomOpenTelemetry(configuration);
 
         services.AddScoped<IDomainEventPublisher, DomainEventPublisher>();
         services.AddSingleton(TimeProvider.System);
@@ -45,7 +39,7 @@ public static class DependencyInjection
 
     private static IServiceCollection AddPersistence(this IServiceCollection services, IConfiguration configuration)
     {
-        var connectionString = configuration.GetConnectionString("CaDemoDb");
+        string? connectionString = configuration.GetConnectionString("CaDemoDb");
         Guard.Against.Null(connectionString, message: "Connection string 'CaDemoDb' not found.");
 
         services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
@@ -55,13 +49,12 @@ public static class DependencyInjection
         {
             options.UseSqlServer(connectionString,
                 providerOptions => providerOptions.EnableRetryOnFailure());
-            
+
             options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
         });
 
-        // make sure IAppDbContext and ITransactionalDbContext return the same instance of the DbContext
         services.AddScoped<IAppDbContext>(sp => sp.GetRequiredService<AppDbContext>());
-        services.AddScoped<ITransactionalDbContext>(sp => sp.GetRequiredService<AppDbContext>());
+        services.AddScoped(sp => sp.GetRequiredService<AppDbContext>().Database);
         services.AddScoped<AppDbContextInitializer>();
 
         return services;
@@ -80,11 +73,14 @@ public static class DependencyInjection
             .AddEntityFrameworkStores<AppDbContext>()
             .AddApiEndpoints();
 
-        services.AddTransient<IIdentityService, IdentityService>();
-        
-        // TODO: add policies
-        //services.AddAuthorization(options =>
-        //    options.AddPolicy(Policies.CanPurge, policy => policy.RequireRole(Roles.Administrator)));
+        // add auth policies
+        services.AddAuthorization(options =>
+            {
+                options.AddPolicy(Policies.CanCreateCompanies, policy => policy.RequireRole(Roles.Admin, Roles.Editor));
+                options.AddPolicy(Policies.CanUpdateCompanies, policy => policy.RequireRole(Roles.Admin, Roles.Editor));
+                options.AddPolicy(Policies.CanDeleteCompanies, policy => policy.RequireRole(Roles.Admin, Roles.Editor));
+            }
+        );
 
         return services;
     }

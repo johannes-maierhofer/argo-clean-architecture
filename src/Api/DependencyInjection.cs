@@ -1,6 +1,8 @@
-﻿namespace Argo.CA.Api;
+﻿using Argo.CA.Application.Common.Auth;
+using Argo.CA.Infrastructure.Auth;
 
-using Application.Common.Authorization;
+namespace Argo.CA.Api;
+
 using Infrastructure.ExceptionHandling;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
@@ -13,8 +15,7 @@ public static class DependencyInjection
     {
         services.AddAutoMapper(typeof(Program));
 
-        // TODO: do not user DummyCurrentUserService once Authentication is implemented
-        services.AddScoped<ICurrentUserService, DummyCurrentUserService>();
+        services.AddScoped<ICurrentUserProvider, CurrentUserProvider>();
 
         services
             .AddExceptionHandlers()

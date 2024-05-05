@@ -10,7 +10,7 @@ using Serilog.Exceptions;
 public static class SerilogExtensions
 {
     public static IServiceCollection AddCustomSerilog(
-        this IServiceCollection services, 
+        this IServiceCollection services,
         Action<LoggerConfiguration>? configure = null)
     {
         var configuration = services.GetConfiguration();

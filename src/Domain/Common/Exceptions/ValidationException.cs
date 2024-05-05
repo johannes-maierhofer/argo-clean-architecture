@@ -1,6 +1,6 @@
-﻿namespace Argo.CA.Application.Common.Exceptions;
+﻿using FluentValidation.Results;
 
-using FluentValidation.Results;
+namespace Argo.CA.Domain.Common.Exceptions;
 
 public class ValidationException() : Exception("One or more validation failures have occurred.")
 {

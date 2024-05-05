@@ -1,5 +1,8 @@
 ﻿namespace Argo.CA.Infrastructure.Persistence;
 
+using Application.Common.Auth;
+using Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -20,7 +23,9 @@ public static class InitializerExtensions
 
 public class AppDbContextInitializer(
     ILogger<AppDbContextInitializer> logger,
-    AppDbContext context)
+    AppDbContext context,
+    UserManager<ApplicationUser> userManager,
+    RoleManager<IdentityRole> roleManager)
 {
     public async Task InitialiseAsync()
     {
@@ -48,8 +53,59 @@ public class AppDbContextInitializer(
         }
     }
 
-    public Task TrySeedAsync()
+    private async Task TrySeedAsync()
     {
-        return Task.CompletedTask;
+        // Default roles
+        await EnsureRoleIsCreated(Roles.Admin);
+        await EnsureRoleIsCreated(Roles.Editor);
+        await EnsureRoleIsCreated(Roles.Reader);
+
+        // Default users
+        await EnsureUserIsCreated(
+            "administrator@localhost",
+            "administrator@localhost",
+            "Administrator1!",
+            [Roles.Admin]);
+
+        await EnsureUserIsCreated(
+            "editor@localhost",
+            "editor@localhost",
+            "Editor1!",
+            [Roles.Editor]);
+
+        await EnsureUserIsCreated(
+            "reader@localhost",
+            "reader@localhost",
+            "Reader1!",
+            [Roles.Editor]);
+    }
+
+    private async Task EnsureRoleIsCreated(string roleName)
+    {
+        var role = new IdentityRole(roleName);
+
+        if (roleManager.Roles.All(r => r.Name != role.Name))
+        {
+            await roleManager.CreateAsync(role);
+        }
+    }
+
+    private async Task EnsureUserIsCreated(
+        string userName,
+        string email,
+        string password,
+        string[] roles)
+    {
+        var user = new ApplicationUser { UserName = userName, Email = email };
+
+        if (userManager.Users.All(u => u.UserName != user.UserName))
+        {
+            await userManager.CreateAsync(user, password);
+
+            if (roles.Any())
+            {
+                await userManager.AddToRolesAsync(user, roles);
+            }
+        }
     }
 }

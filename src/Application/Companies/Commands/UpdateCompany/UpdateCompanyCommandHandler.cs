@@ -1,8 +1,9 @@
-﻿namespace Argo.CA.Application.Companies.Commands.UpdateCompany;
+﻿using Argo.CA.Domain.Common.Exceptions;
+
+namespace Argo.CA.Application.Companies.Commands.UpdateCompany;
 
 using Domain.CompanyAggregate;
 using Common.CQRS;
-using Common.Exceptions;
 using Common.Persistence;
 using Domain.CompanyAggregate.ValueObjects;
 using Microsoft.EntityFrameworkCore;

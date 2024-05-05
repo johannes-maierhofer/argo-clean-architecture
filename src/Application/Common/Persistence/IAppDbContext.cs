@@ -1,12 +1,15 @@
-﻿namespace Argo.CA.Application.Common.Persistence;
-
-using Domain.CompanyAggregate;
+﻿using Argo.CA.Domain.CompanyAggregate;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 
-public interface IAppDbContext
+namespace Argo.CA.Application.Common.Persistence
 {
-    public DbSet<Company> Companies { get; }
-    
-    Task<int> SaveChangesAsync(CancellationToken cancellationToken);
-   
+    public interface IAppDbContext
+    {
+        public DbSet<Company> Companies { get; }
+
+        DatabaseFacade Database { get; }
+
+        Task<int> SaveChangesAsync(CancellationToken cancellationToken);
+    }
 }

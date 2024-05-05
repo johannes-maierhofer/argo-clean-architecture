@@ -37,7 +37,16 @@ public class SqlServerTestDatabase : ITestDatabase
 
         _respawner = await Respawner.CreateAsync(_connectionString, new RespawnerOptions
         {
-            TablesToIgnore = ["__EFMigrationsHistory"]
+            TablesToIgnore = [
+                "__EFMigrationsHistory",
+                "AspNetRoleClaims",
+                "AspNetRoles",
+                "AspNetUserClaims",
+                "AspNetUserLogins",
+                "AspNetUserRoles",
+                "AspNetUsers",
+                "AspNetUserTokens"
+            ]
         });
     }
 

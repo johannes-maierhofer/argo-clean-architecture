@@ -6,9 +6,8 @@
     using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore;
 
-    // TODO: get rid of ITransactionalDbContext
     public class AppDbContext(DbContextOptions<AppDbContext> options)
-        : IdentityDbContext<ApplicationUser>(options), IAppDbContext, ITransactionalDbContext
+        : IdentityDbContext<ApplicationUser>(options), IAppDbContext
     {
         public DbSet<Company> Companies => Set<Company>();
         

@@ -1,10 +1,8 @@
-﻿namespace Argo.CA.Application.Companies.Queries.GetCompanyList;
+﻿using Argo.CA.Application.Common.CQRS;
+using Argo.CA.Application.Common.Models;
+using Argo.CA.Application.Common.Persistence;
 
-using System.Threading.Tasks;
-using Common.CQRS;
-using Common.Mappings;
-using Common.Models;
-using Common.Persistence;
+namespace Argo.CA.Application.Companies.Queries.GetCompanyList;
 
 public class GetCompanyListQueryHandler(IAppDbContext dbContext)
     : IQueryHandler<GetCompanyListQuery, PaginatedList<CompanyListDto>>

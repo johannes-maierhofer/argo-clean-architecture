@@ -1,9 +1,10 @@
-﻿namespace Argo.CA.Application.Companies.Queries.GetCompanyDetails;
+﻿using Argo.CA.Domain.Common.Exceptions;
+
+namespace Argo.CA.Application.Companies.Queries.GetCompanyDetails;
 
 using System.Threading.Tasks;
 using Domain.CompanyAggregate;
 using Common.CQRS;
-using Common.Exceptions;
 using Common.Persistence;
 using Microsoft.EntityFrameworkCore;
 

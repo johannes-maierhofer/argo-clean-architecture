@@ -1,7 +1,6 @@
-﻿namespace Argo.CA.Application.Common.Mappings;
+﻿namespace Argo.CA.Application.Common.Models;
 
 using Microsoft.EntityFrameworkCore;
-using Models;
 
 public static class MappingExtensions
 {

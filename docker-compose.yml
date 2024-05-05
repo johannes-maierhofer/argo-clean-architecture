@@ -1,4 +1,4 @@
-﻿version: '3.4'
+version: '3.4'
 name: "argo-ca-demo"
 
 services:
@@ -17,6 +17,11 @@ services:
 
   api:
     image: ${DOCKER_REGISTRY-}argocacompanyapi
+    depends_on:
+    - sql-server-db
+    - rabbitmq
+    - seq
+    - jaeger
     build:
       context: .
       dockerfile: src/Api/Dockerfile

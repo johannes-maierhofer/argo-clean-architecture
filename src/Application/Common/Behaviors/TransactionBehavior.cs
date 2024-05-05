@@ -5,12 +5,14 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 
-public class TransactionBehavior<TRequest, TResponse>(ITransactionalDbContext dbContext)
+public class TransactionBehavior<TRequest, TResponse>(IAppDbContext dbContext)
     : IPipelineBehavior<TRequest, TResponse>
     where TRequest : IBaseCommand
     where TResponse : notnull
 {
-    public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next,
+    public async Task<TResponse> Handle(
+        TRequest request,
+        RequestHandlerDelegate<TResponse> next,
         CancellationToken cancellationToken)
     {
         // for Connection Resiliency

@@ -1,4 +1,7 @@
-﻿namespace Argo.CA.Api.Controllers;
+﻿using Argo.CA.Application.Common.Auth;
+using Microsoft.AspNetCore.Authorization;
+
+namespace Argo.CA.Api.Controllers;
 
 using Application.Companies.Commands.CreateCompany;
 using Application.Companies.Commands.UpdateCompany;
@@ -15,6 +18,7 @@ using DotSwashbuckle.AspNetCore.Annotations;
 public class CompaniesController(ISender mediator, IMapper mapper) : ControllerBase
 {
     [HttpPost]
+    [Authorize(Policy = Policies.CanCreateCompanies)]
     [SwaggerOperation(OperationId = "CreateCompany", Summary = "Create company")]
     [SwaggerResponse(201, "The company was created", typeof(CreateCompanyResponse))]
     [SwaggerResponse(400, "The company data is invalid", typeof(ValidationProblemDetails))]
@@ -42,6 +46,7 @@ public class CompaniesController(ISender mediator, IMapper mapper) : ControllerB
 
     [HttpPut]
     [Route("{companyId:guid}")]
+    [Authorize(Policy = Policies.CanCreateCompanies)]
     [SwaggerOperation(OperationId = "UpdateCompany", Summary = "Update company")]
     [SwaggerResponse(204)]
     [SwaggerResponse(400, "The company data is invalid", typeof(ValidationProblemDetails))]

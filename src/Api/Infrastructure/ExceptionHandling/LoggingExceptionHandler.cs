@@ -1,6 +1,7 @@
-﻿namespace Argo.CA.Api.Infrastructure.ExceptionHandling;
+﻿using Argo.CA.Domain.Common.Exceptions;
 
-using Application.Common.Exceptions;
+namespace Argo.CA.Api.Infrastructure.ExceptionHandling;
+
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;

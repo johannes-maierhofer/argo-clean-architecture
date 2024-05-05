@@ -18,11 +18,12 @@ app.MapGroup("/identity")
     .MapIdentityApi<ApplicationUser>()
     .WithTags("Identity");
 
-// TODO: in what environments should the DB be migrated
 if (app.Environment.IsDevelopment())
 {
     await app.Services.InitialiseDatabaseAsync();
 }
+
+app.UseHttpsRedirection();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -31,7 +32,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseExceptionHandler(_ => { });

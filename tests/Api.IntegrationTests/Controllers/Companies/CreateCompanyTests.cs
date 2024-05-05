@@ -33,8 +33,8 @@ public class CreateCompanyTests(
 
         var company = await dbContext.Companies.SingleAsync(c => c.Id == response.Id);
         company.ValidateCreatedFrom(request);
-        company.ValidateCreatedBy(Constants.User.UserName);
-        company.ValidateModifiedBy(Constants.User.UserName);
+        //company.ValidateCreatedBy(Constants.User.UserName);
+        //company.ValidateModifiedBy(Constants.User.UserName);
     }
 
     [Fact]

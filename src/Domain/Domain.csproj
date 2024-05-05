@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="Ardalis.GuardClauses.Custom" />
+    <PackageReference Include="FluentValidation" />
     <PackageReference Include="MediatR.Contracts" />
   </ItemGroup>
 

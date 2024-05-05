@@ -1,13 +1,14 @@
-﻿namespace Argo.CA.Infrastructure.Persistence.Interceptors;
+﻿using Argo.CA.Application.Common.Auth;
 
-using Application.Common.Authorization;
+namespace Argo.CA.Infrastructure.Persistence.Interceptors;
+
 using Domain.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
 public class AuditableEntityInterceptor(
-    ICurrentUserService currentUserService,
+    ICurrentUserProvider currentUserProvider,
     TimeProvider dateTime)
     : SaveChangesInterceptor
 {
@@ -28,13 +29,14 @@ public class AuditableEntityInterceptor(
     private void UpdateEntities(DbContext? context)
     {
         if (context == null) return;
+        var currentUser = currentUserProvider.GetCurrentUser();
 
         foreach (var entry in context.ChangeTracker
                      .Entries<IAuditCreated>()
                      .Where(e => e.State == EntityState.Added)
                      .Select(e => e.Entity))
         {
-            entry.SetCreated(dateTime.GetUtcNow(), currentUserService.GetName());
+            entry.SetCreated(dateTime.GetUtcNow(), currentUser.UserName);
         }
 
         foreach (var entry in context.ChangeTracker
@@ -42,7 +44,7 @@ public class AuditableEntityInterceptor(
                      .Where(e => e.HasChanges())
                      .Select(e => e.Entity))
         {
-            entry.SetModified(dateTime.GetUtcNow(), currentUserService.GetName());
+            entry.SetModified(dateTime.GetUtcNow(), currentUser.UserName);
         }
     }
 }
