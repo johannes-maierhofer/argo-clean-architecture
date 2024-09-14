@@ -1,7 +1,6 @@
-﻿using Argo.CA.Application.Common.Auth;
-using Microsoft.AspNetCore.Authorization;
+﻿namespace Argo.CA.Api.Controllers;
 
-namespace Argo.CA.Api.Controllers;
+using Microsoft.AspNetCore.Authorization;
 
 using Application.Companies.Commands.CreateCompany;
 using Application.Companies.Commands.UpdateCompany;
@@ -12,13 +11,14 @@ using Contracts.Companies;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using DotSwashbuckle.AspNetCore.Annotations;
+using Application.Common.Security.Policies;
 
 [ApiController]
 [Route("companies")]
 public class CompaniesController(ISender mediator, IMapper mapper) : ControllerBase
 {
     [HttpPost]
-    [Authorize(Policy = Policies.CanCreateCompanies)]
+    // [Authorize(Policy = Policy.Company.Create)]
     [SwaggerOperation(OperationId = "CreateCompany", Summary = "Create company")]
     [SwaggerResponse(201, "The company was created", typeof(CreateCompanyResponse))]
     [SwaggerResponse(400, "The company data is invalid", typeof(ValidationProblemDetails))]
@@ -46,7 +46,7 @@ public class CompaniesController(ISender mediator, IMapper mapper) : ControllerB
 
     [HttpPut]
     [Route("{companyId:guid}")]
-    [Authorize(Policy = Policies.CanCreateCompanies)]
+    // [Authorize(Policy = Policy.Company.Update)]
     [SwaggerOperation(OperationId = "UpdateCompany", Summary = "Update company")]
     [SwaggerResponse(204)]
     [SwaggerResponse(400, "The company data is invalid", typeof(ValidationProblemDetails))]
@@ -71,6 +71,7 @@ public class CompaniesController(ISender mediator, IMapper mapper) : ControllerB
     }
 
     [HttpGet]
+    // [Authorize(Policy = Policy.Company.Get)]
     [SwaggerOperation(OperationId = "GetCompanyList", Summary = "Get company list")]
     [SwaggerResponse(200, "Success", typeof(GetCompanyListResponse))]
     [SwaggerResponse(401)]
@@ -91,6 +92,7 @@ public class CompaniesController(ISender mediator, IMapper mapper) : ControllerB
 
     [HttpGet]
     [Route("{companyId:guid}")]
+    // [Authorize(Policy = Policy.Company.Get)]
     [SwaggerOperation(OperationId = "GetCompanyDetails", Summary = "Get company details")]
     [SwaggerResponse(200, "Success", typeof(GetCompanyDetailsResponse))]
     [SwaggerResponse(404, "The company was not found", typeof(ProblemDetails))]

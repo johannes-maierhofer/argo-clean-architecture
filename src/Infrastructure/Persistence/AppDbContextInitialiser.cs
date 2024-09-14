@@ -1,7 +1,8 @@
-﻿namespace Argo.CA.Infrastructure.Persistence;
+﻿using Argo.CA.Domain.UserAggregate;
 
-using Application.Common.Auth;
-using Identity;
+namespace Argo.CA.Infrastructure.Persistence;
+
+using Argo.CA.Application.Common.Security;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,7 +25,7 @@ public static class InitializerExtensions
 public class AppDbContextInitializer(
     ILogger<AppDbContextInitializer> logger,
     AppDbContext context,
-    UserManager<ApplicationUser> userManager,
+    UserManager<User> userManager,
     RoleManager<IdentityRole> roleManager)
 {
     public async Task InitialiseAsync()
@@ -62,20 +63,20 @@ public class AppDbContextInitializer(
 
         // Default users
         await EnsureUserIsCreated(
-            "administrator@localhost",
-            "administrator@localhost",
-            "Administrator1!",
+            "admin@argo-ca.com",
+            "admin@argo-ca.com",
+            "Admin1!",
             [Roles.Admin]);
 
         await EnsureUserIsCreated(
-            "editor@localhost",
-            "editor@localhost",
+            "editor@argo-ca.com",
+            "editor@argo-ca.com",
             "Editor1!",
             [Roles.Editor]);
 
         await EnsureUserIsCreated(
-            "reader@localhost",
-            "reader@localhost",
+            "reader@argo-ca.com",
+            "reader@argo-ca.com",
             "Reader1!",
             [Roles.Editor]);
     }
@@ -96,7 +97,7 @@ public class AppDbContextInitializer(
         string password,
         string[] roles)
     {
-        var user = new ApplicationUser { UserName = userName, Email = email };
+        var user = new User { UserName = userName, Email = email };
 
         if (userManager.Users.All(u => u.UserName != user.UserName))
         {

@@ -1,4 +1,4 @@
-﻿using Argo.CA.Application.Common.Auth;
+﻿using Argo.CA.Application.Common.Security.CurrentUserProvider;
 
 namespace Argo.CA.Api.IntegrationTests.Testing.TestDoubles;
 

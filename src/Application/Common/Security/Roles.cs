@@ -1,4 +1,4 @@
-﻿namespace Argo.CA.Application.Common.Auth
+﻿namespace Argo.CA.Application.Common.Security
 {
     public static class Roles
     {

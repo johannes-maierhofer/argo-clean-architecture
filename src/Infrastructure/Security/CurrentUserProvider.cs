@@ -1,8 +1,8 @@
-using Argo.CA.Application.Common.Auth;
+using Argo.CA.Application.Common.Security.CurrentUserProvider;
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 
-namespace Argo.CA.Infrastructure.Auth;
+namespace Argo.CA.Infrastructure.Security;
 
 public class CurrentUserProvider(IHttpContextAccessor httpContextAccessor) : ICurrentUserProvider
 {

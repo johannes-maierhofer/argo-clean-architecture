@@ -1,7 +1,6 @@
-﻿using Argo.CA.Application.Common.Auth;
+﻿namespace Argo.CA.Infrastructure.Persistence.Interceptors;
 
-namespace Argo.CA.Infrastructure.Persistence.Interceptors;
-
+using Argo.CA.Application.Common.Security.CurrentUserProvider;
 using Domain.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;

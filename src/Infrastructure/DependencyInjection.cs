@@ -1,19 +1,24 @@
 ﻿using Ardalis.GuardClauses;
-using Argo.CA.Application.Common.Auth;
 using Argo.CA.Application.Common.Persistence;
+using Argo.CA.Application.Common.Security;
+using Argo.CA.Application.Common.Security.CurrentUserProvider;
+using Argo.CA.Application.Common.Security.JwtTokenGeneration;
+using Argo.CA.Application.Common.Security.Policies;
 using Argo.CA.Domain.Common.Events;
-using Argo.CA.Infrastructure.Identity;
+using Argo.CA.Domain.UserAggregate;
 using Argo.CA.Infrastructure.Logging;
 using Argo.CA.Infrastructure.OpenTelemetry;
 using Argo.CA.Infrastructure.Persistence;
 using Argo.CA.Infrastructure.Persistence.Interceptors;
+using Argo.CA.Infrastructure.Security;
+using Argo.CA.Infrastructure.Security.JwtTokenGeneration;
 using Argo.CA.Infrastructure.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 
 namespace Argo.CA.Infrastructure;
 
@@ -21,13 +26,13 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructureServices(
         this IServiceCollection services,
-        IConfiguration configuration,
-        IHostEnvironment environment)
+        IConfiguration configuration)
     {
         services
             .AddHttpContextAccessor()
             .AddPersistence(configuration)
-            .AddAuth()
+            .AddAuthentication(configuration)
+            .AddAuthorization()
             .AddCustomSerilog()
             .AddCustomOpenTelemetry(configuration);
 
@@ -60,25 +65,38 @@ public static class DependencyInjection
         return services;
     }
 
-    private static IServiceCollection AddAuth(this IServiceCollection services)
+    private static IServiceCollection AddAuthentication(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddAuthentication()
-            .AddBearerToken(IdentityConstants.BearerScheme);
+        services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.Section));
 
-        services.AddAuthorizationBuilder();
+        services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
 
         services
-            .AddIdentityCore<ApplicationUser>()
+            .ConfigureOptions<JwtBearerTokenValidationConfiguration>()
+            .AddAuthentication(defaultScheme: JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer();
+
+        services
+            .AddIdentityCore<User>()
             .AddRoles<IdentityRole>()
-            .AddEntityFrameworkStores<AppDbContext>()
-            .AddApiEndpoints();
+            .AddEntityFrameworkStores<AppDbContext>();
+
+        return services;
+    }
+
+    private static IServiceCollection AddAuthorization(this IServiceCollection services)
+    {
+        services.AddAuthorizationBuilder();
+
+        services.AddScoped<ICurrentUserProvider, CurrentUserProvider>();
 
         // add auth policies
         services.AddAuthorization(options =>
             {
-                options.AddPolicy(Policies.CanCreateCompanies, policy => policy.RequireRole(Roles.Admin, Roles.Editor));
-                options.AddPolicy(Policies.CanUpdateCompanies, policy => policy.RequireRole(Roles.Admin, Roles.Editor));
-                options.AddPolicy(Policies.CanDeleteCompanies, policy => policy.RequireRole(Roles.Admin, Roles.Editor));
+                options.AddPolicy(Policy.Company.Get, policy => policy.RequireRole(Roles.Admin, Roles.Editor, Roles.Reader));
+                options.AddPolicy(Policy.Company.Create, policy => policy.RequireRole(Roles.Admin, Roles.Editor));
+                options.AddPolicy(Policy.Company.Update, policy => policy.RequireRole(Roles.Admin, Roles.Editor));
+                options.AddPolicy(Policy.Company.Delete, policy => policy.RequireRole(Roles.Admin, Roles.Editor));
             }
         );
 
