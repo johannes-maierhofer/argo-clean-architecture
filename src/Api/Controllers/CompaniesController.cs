@@ -1,7 +1,5 @@
 ﻿namespace Argo.CA.Api.Controllers;
 
-using Microsoft.AspNetCore.Authorization;
-
 using Application.Companies.Commands.CreateCompany;
 using Application.Companies.Commands.UpdateCompany;
 using Application.Companies.Queries.GetCompanyDetails;
@@ -10,8 +8,7 @@ using AutoMapper;
 using Contracts.Companies;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using DotSwashbuckle.AspNetCore.Annotations;
-using Application.Common.Security.Policies;
+using Swashbuckle.AspNetCore.Annotations;
 
 [ApiController]
 [Route("companies")]

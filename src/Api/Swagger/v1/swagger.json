@@ -31,7 +31,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "text/plain": {
                 "schema": {
@@ -330,12 +330,6 @@
   "components": {
     "schemas": {
       "CompanyDetailsLocation": {
-        "required": [
-          "city",
-          "countryCode",
-          "postCode",
-          "street"
-        ],
         "type": "object",
         "properties": {
           "countryCode": {
@@ -354,10 +348,6 @@
         "additionalProperties": false
       },
       "CompanyListItem": {
-        "required": [
-          "id",
-          "name"
-        ],
         "type": "object",
         "properties": {
           "id": {
@@ -375,15 +365,6 @@
         "additionalProperties": false
       },
       "CreateCompanyRequest": {
-        "required": [
-          "city",
-          "countryCode",
-          "email",
-          "name",
-          "phoneNumber",
-          "postCode",
-          "street"
-        ],
         "type": "object",
         "properties": {
           "name": {
@@ -415,9 +396,6 @@
         "additionalProperties": false
       },
       "CreateCompanyResponse": {
-        "required": [
-          "id"
-        ],
         "type": "object",
         "properties": {
           "id": {
@@ -428,12 +406,6 @@
         "additionalProperties": false
       },
       "GetCompanyDetailsResponse": {
-        "required": [
-          "email",
-          "id",
-          "name",
-          "phoneNumber"
-        ],
         "type": "object",
         "properties": {
           "id": {
@@ -460,12 +432,6 @@
         "additionalProperties": false
       },
       "GetCompanyListResponse": {
-        "required": [
-          "items",
-          "pageNumber",
-          "totalCount",
-          "totalPages"
-        ],
         "type": "object",
         "properties": {
           "items": {
@@ -490,10 +456,6 @@
         "additionalProperties": false
       },
       "LoginRequest": {
-        "required": [
-          "email",
-          "password"
-        ],
         "type": "object",
         "properties": {
           "email": {
@@ -551,16 +513,6 @@
         "additionalProperties": { }
       },
       "UpdateCompanyRequest": {
-        "required": [
-          "city",
-          "countryCode",
-          "description",
-          "email",
-          "name",
-          "phoneNumber",
-          "postCode",
-          "street"
-        ],
         "type": "object",
         "properties": {
           "name": {
@@ -591,9 +543,6 @@
         "additionalProperties": false
       },
       "ValidationProblemDetails": {
-        "required": [
-          "errors"
-        ],
         "type": "object",
         "properties": {
           "type": {
