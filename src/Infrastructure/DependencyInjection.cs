@@ -14,11 +14,13 @@ using Argo.CA.Infrastructure.Security;
 using Argo.CA.Infrastructure.Security.JwtTokenGeneration;
 using Argo.CA.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace Argo.CA.Infrastructure;
 
@@ -26,12 +28,13 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructureServices(
         this IServiceCollection services,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        IWebHostEnvironment environment)
     {
         services
             .AddHttpContextAccessor()
             .AddPersistence(configuration)
-            .AddAuthentication(configuration)
+            .AddAuthentication(configuration, environment)
             .AddAuthorization()
             .AddCustomSerilog()
             .AddCustomOpenTelemetry(configuration);
@@ -65,16 +68,22 @@ public static class DependencyInjection
         return services;
     }
 
-    private static IServiceCollection AddAuthentication(this IServiceCollection services, IConfiguration configuration)
+    private static IServiceCollection AddAuthentication(
+        this IServiceCollection services,
+        IConfiguration configuration,
+        IWebHostEnvironment environment)
     {
         services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.Section));
 
         services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
 
-        services
-            .ConfigureOptions<JwtBearerTokenValidationConfiguration>()
-            .AddAuthentication(defaultScheme: JwtBearerDefaults.AuthenticationScheme)
-            .AddJwtBearer();
+        if (!environment.IsEnvironment("Testing"))
+        {
+            services
+                .ConfigureOptions<JwtBearerTokenValidationConfiguration>()
+                .AddAuthentication(defaultScheme: JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer();
+        }
 
         services
             .AddIdentityCore<User>()

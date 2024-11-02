@@ -1,4 +1,6 @@
-﻿namespace Argo.CA.Api.IntegrationTests.Testing;
+﻿using Argo.CA.Api.IntegrationTests.Testing.Authentication;
+
+namespace Argo.CA.Api.IntegrationTests.Testing;
 
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -10,8 +12,10 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
     {
         builder.UseEnvironment("Testing");
         
-        builder.ConfigureTestServices(_ =>
+        builder.ConfigureTestServices(services =>
         {
+            services.AddTestJwtBearerAuthentication();
+
             // add MassTransit TestHarness
             // see https://masstransit.io/documentation/concepts/testing
             //services.AddMassTransitTestHarness(_ => { });
