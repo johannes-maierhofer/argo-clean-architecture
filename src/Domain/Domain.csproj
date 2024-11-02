@@ -8,6 +8,7 @@
     <PackageReference Include="Ardalis.GuardClauses.Custom" />
     <PackageReference Include="FluentValidation" />
     <PackageReference Include="MediatR.Contracts" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" />
   </ItemGroup>
 
   <ItemGroup>

@@ -6,7 +6,6 @@ using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Testing;
 using Testing.Constants;
-using Testing.Extensions;
 using TestUtils;
 using Xunit.Abstractions;
 
