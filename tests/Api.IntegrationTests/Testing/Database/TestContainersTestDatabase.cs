@@ -24,7 +24,7 @@ public class TestContainersTestDatabase : ITestDatabase
         .WithEnvironment("SQLCMDUSER", Username)
         .WithEnvironment("SQLCMDPASSWORD", Password)
         .WithEnvironment("MSSQL_SA_PASSWORD", Password)
-        .WithWaitStrategy(Wait.ForUnixContainer().UntilCommandIsCompleted("/opt/mssql-tools/bin/sqlcmd", "-Q", "SELECT 1;"))
+        .WithWaitStrategy(Wait.ForUnixContainer().UntilCommandIsCompleted("/opt/mssql-tools18/bin/sqlcmd", "-C", "-Q", "SELECT 1;"))
         .Build();
 
     private Respawner _respawner = null!;
