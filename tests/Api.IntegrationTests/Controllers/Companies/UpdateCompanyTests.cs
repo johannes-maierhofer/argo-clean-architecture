@@ -59,7 +59,7 @@ public class UpdateCompanyTests(
         var action = () => client.UpdateCompanyAsync(company.Id, request);
 
         // Assert
-        var assertions = await action.Should().ThrowAsync<ApiException<ValidationProblemDetails>>();
+        var assertions = await action.Should().ThrowAsync<ApiException<ValidationProblemDetails>>("Company name must be unique.");
         assertions.And.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
         assertions.And.Result.Title.Should().Be("Invalid");
     }

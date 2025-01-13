@@ -53,3 +53,8 @@ Add-Migration [MigrationName] -OutputDir Persistence/Migrations
   "email": "admin@argo-ca.com",
   "password": "Admin1!"
 }
+
+## TODO
+
+- Fake bearer token in integration tests
+- Remove FakeCurrentUserProvider

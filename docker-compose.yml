@@ -3,7 +3,7 @@ name: "argo-ca-demo"
 
 services:
 
-  sql-server-db:
+  sqldata:
     image: mcr.microsoft.com/mssql/server:2019-latest
 
   rabbitmq:
@@ -18,7 +18,7 @@ services:
   api:
     image: ${DOCKER_REGISTRY-}argocacompanyapi
     depends_on:
-    - sql-server-db
+    - sqldata
     - rabbitmq
     - seq
     - jaeger

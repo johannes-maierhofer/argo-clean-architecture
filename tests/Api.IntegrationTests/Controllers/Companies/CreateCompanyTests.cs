@@ -1,4 +1,7 @@
-﻿namespace Argo.CA.Api.IntegrationTests.Controllers.Companies;
+﻿using Argo.CA.Api.IntegrationTests.Testing.Authentication;
+using Argo.CA.Api.IntegrationTests.Testing.Extensions;
+
+namespace Argo.CA.Api.IntegrationTests.Controllers.Companies;
 
 using System.Net;
 using ApiClients;
@@ -6,7 +9,6 @@ using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Testing;
 using Testing.Constants;
-using Testing.Extensions;
 using TestUtils;
 using Xunit.Abstractions;
 
@@ -20,7 +22,7 @@ public class CreateCompanyTests(
     public async Task CreateCompany_WhenRequestIsValid_ShouldSucceed()
     {
         // Arrange
-        var client = Factory.CreateApiClient();
+        var client = Factory.CreateApiClient(b => b.AsAdmin());
         var request = CreateRequest();
 
         // Act
@@ -33,8 +35,8 @@ public class CreateCompanyTests(
 
         var company = await dbContext.Companies.SingleAsync(c => c.Id == response.Id);
         company.ValidateCreatedFrom(request);
-        //company.ValidateCreatedBy(Constants.User.UserName);
-        //company.ValidateModifiedBy(Constants.User.UserName);
+        company.ValidateCreatedBy(Constants.User.Admin.Name);
+        company.ValidateModifiedBy(Constants.User.Admin.Name);
     }
 
     [Fact]
@@ -52,6 +54,21 @@ public class CreateCompanyTests(
         assertions.And.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
         assertions.And.Result.Title.Should().Be("Invalid");
         assertions.And.Result.Errors.First().Key.Should().Be("Email");
+    }
+
+    [Fact]
+    public async Task CreateCompany_WhenUserIsOnlyReader_ShouldReturnForbidden()
+    {
+        // Arrange
+        var client = Factory.CreateApiClient(b => b.AsReader());
+        var request = CreateRequest();
+
+        // Act
+        var action = () => client.CreateCompanyAsync(request);
+
+        // Assert
+        var assertions = await action.Should().ThrowAsync<ApiException>();
+        assertions.And.StatusCode.Should().Be((int)HttpStatusCode.Forbidden);
     }
 
     private static CreateCompanyRequest CreateRequest(

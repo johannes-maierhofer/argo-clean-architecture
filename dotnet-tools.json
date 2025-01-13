@@ -2,11 +2,9 @@
   "version": 1,
   "isRoot": true,
   "tools": {
-    "DotSwashbuckle.AspNetCore.Cli": {
-      "version": "3.0.8",
-      "commands": [
-        "swagger"
-      ]
+    "Swashbuckle.AspNetCore.Cli": {
+      "version": "6.8.1",
+      "commands": [ "swagger" ]
     }
   }
 }

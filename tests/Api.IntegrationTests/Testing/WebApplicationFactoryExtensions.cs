@@ -1,8 +1,12 @@
-﻿namespace Argo.CA.Api.IntegrationTests.Testing;
+﻿using Argo.CA.Application.Common.Security;
+
+namespace Argo.CA.Api.IntegrationTests.Testing;
 
 using ApiClients;
+using Authentication;
 using CA.Infrastructure.Logging;
 using CA.Infrastructure.Persistence;
+using Docker.DotNet.Models;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
@@ -37,9 +41,18 @@ public static class WebApplicationFactoryExtensions
         });
     }
 
-    public static ApiClient CreateApiClient(this WebApplicationFactory<Program> factory)
+    public static ApiClient CreateApiClient(this WebApplicationFactory<Program> factory, Action<JwtTokenBuilder>? jwtBuilder = null)
     {
-        var httpClient = factory.CreateClient();
+        jwtBuilder ??= builder =>
+        {
+            // per default the user has all the necessary claims
+            builder.AsAdmin();
+        };
+
+        var httpClient = factory
+            .CreateClient()
+            .WithJwtBearerToken(jwtBuilder);
+
         return new ApiClient(httpClient.BaseAddress?.ToString(), httpClient);
     }
 

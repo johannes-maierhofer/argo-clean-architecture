@@ -4,7 +4,22 @@ public static partial class Constants
 {
     public static class User
     {
-        public const string UserName = "fake_user";
-        public const string Email = "fake_user@aol.com";
+        public static class Admin
+        {
+            public const string Name = "Adam Admin";
+            public const string Email = "a.admin@argo-ca.com";
+        }
+
+        public static class Editor
+        {
+            public const string Name = "Edith Editor";
+            public const string Email = "e.editor@argo-ca.com";
+        }
+
+        public static class Reader
+        {
+            public const string Name = "Ron Reader";
+            public const string Email = "r.reader@argo-ca.com";
+        }
     }
 }

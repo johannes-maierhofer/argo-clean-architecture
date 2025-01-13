@@ -1,25 +1,18 @@
-﻿using Argo.CA.Application.Common.Auth;
-using Argo.CA.Infrastructure.Auth;
-
-namespace Argo.CA.Api;
-
-using Infrastructure.ExceptionHandling;
+﻿using Argo.CA.Api.Infrastructure.ExceptionHandling;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
 
+namespace Argo.CA.Api;
+
 public static class DependencyInjection
 {
-    public static IServiceCollection AddApiServices(
-        this IServiceCollection services,
-        IHostEnvironment environment)
+    public static IServiceCollection AddApiServices(this IServiceCollection services)
     {
         services.AddAutoMapper(typeof(Program));
 
-        services.AddScoped<ICurrentUserProvider, CurrentUserProvider>();
-
         services
             .AddExceptionHandlers()
-            .AddCustomSwaggerGen(environment);
+            .AddCustomSwaggerGen();
 
         services.AddControllers();
         
@@ -41,9 +34,7 @@ public static class DependencyInjection
         return services;
     }
 
-    private static IServiceCollection AddCustomSwaggerGen(
-        this IServiceCollection services,
-        IHostEnvironment environment)
+    private static IServiceCollection AddCustomSwaggerGen(this IServiceCollection services)
     {
         services.AddSwaggerGen(c =>
         {
@@ -51,34 +42,25 @@ public static class DependencyInjection
             c.EnableAnnotations();
             c.SupportNonNullableReferenceTypes();
 
-            if (environment.IsEnvironment("SwaggerBuild"))
-            {
-                // ignore identity endpoints in the generated swagger.json
-                c.DocInclusionPredicate((_, apiDesc) => !(apiDesc.RelativePath?.StartsWith("identity") ?? false));
-            }
-
-            c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-            {
-                In = ParameterLocation.Header,
-                Description = "Please enter token",
-                Name = "Authorization",
-                Type = SecuritySchemeType.Http,
-                BearerFormat = "JWT",
-                Scheme = "bearer"
-            });
+            c.AddSecurityDefinition("Bearer",
+                new OpenApiSecurityScheme
+                {
+                    In = ParameterLocation.Header,
+                    Description = "Please enter token",
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.Http,
+                    BearerFormat = "JWT",
+                    Scheme = "bearer"
+                });
 
             c.AddSecurityRequirement(new OpenApiSecurityRequirement
             {
                 {
                     new OpenApiSecurityScheme
                     {
-                        Reference = new OpenApiReference
-                        {
-                            Type=ReferenceType.SecurityScheme,
-                            Id="Bearer"
-                        }
+                        Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
                     },
-                    new string[]{}
+                    new string[] { }
                 }
             });
         });

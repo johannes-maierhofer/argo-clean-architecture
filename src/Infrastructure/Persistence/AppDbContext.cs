@@ -1,13 +1,14 @@
-﻿namespace Argo.CA.Infrastructure.Persistence
+﻿using Argo.CA.Domain.UserAggregate;
+
+namespace Argo.CA.Infrastructure.Persistence
 {
     using Application.Common.Persistence;
-    using Identity;
     using Domain.CompanyAggregate;
     using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore;
 
     public class AppDbContext(DbContextOptions<AppDbContext> options)
-        : IdentityDbContext<ApplicationUser>(options), IAppDbContext
+        : IdentityDbContext<User>(options), IAppDbContext
     {
         public DbSet<Company> Companies => Set<Company>();
         

@@ -2,14 +2,14 @@ version: '3.4'
 
 services:
 
-  sql-server-db:
-    ports:
-      - "1433:1433"
+  sqldata:
     environment:
-      SA_PASSWORD: "str0ngp@ssword"
-      ACCEPT_EULA: "Y"
+      - MSSQL_SA_PASSWORD=Strong@Passw0rd
+      - ACCEPT_EULA=Y
+    ports:
+      - 5433:1433
     volumes:
-      - acd_sql_data:/home/sql/data
+      - ./vol/sqlserver/data:/var/opt/mssql/data
 
   rabbitmq:
     ports:
