@@ -10,9 +10,8 @@ using Xunit.Abstractions;
 
 public class GetCompanyDetailsTests(
     ITestOutputHelper output,
-    CustomWebApplicationFactory factory,
     DatabaseFixture database)
-    : IntegrationTestBase(output, factory, database)
+    : IntegrationTestBase(output, database)
 {
     [Fact]
     public async Task GetCompanyDetails_ForExistingCompany_ShouldReturnExpectedResponse()
@@ -21,7 +20,8 @@ public class GetCompanyDetailsTests(
         var company = CompanyBuilder.Create().Build();
         await AddEntityToDb(company);
 
-        var client = Factory.CreateApiClient();
+        await using var factory = CreateWebAppFactory();
+        var client = factory.CreateApiClient();
 
         // Act
         var response = await client.GetCompanyDetailsAsync(company.Id);
@@ -35,7 +35,9 @@ public class GetCompanyDetailsTests(
     {
         // Arrange
         var nonExistingCompanyId = Guid.NewGuid();
-        var client = Factory.CreateApiClient();
+
+        await using var factory = CreateWebAppFactory();
+        var client = factory.CreateApiClient();
 
         // Act
         var action = () => client.GetCompanyDetailsAsync(nonExistingCompanyId);

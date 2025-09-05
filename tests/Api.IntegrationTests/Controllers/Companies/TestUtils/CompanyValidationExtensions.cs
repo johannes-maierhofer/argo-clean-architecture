@@ -4,7 +4,7 @@ using ApiClients;
 using Domain.CompanyAggregate;
 using FluentAssertions;
 
-public static class CompanyExtensions
+public static class CompanyValidationExtensions
 {
     public static void ValidateCreatedFrom(this Company company, CreateCompanyRequest request)
     {

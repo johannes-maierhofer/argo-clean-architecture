@@ -9,7 +9,6 @@ using Respawn;
 public class SqlServerTestDatabase : ITestDatabase
 {
     private Respawner _respawner = null!;
-    private readonly string _connectionString;
 
     public SqlServerTestDatabase()
     {
@@ -19,15 +18,17 @@ public class SqlServerTestDatabase : ITestDatabase
             .AddEnvironmentVariables()
             .Build();
 
-        var connectionString = configuration.GetConnectionString("CaDemoDb");
-        Guard.Against.Null(connectionString);
-        _connectionString = connectionString;
+        var connString = configuration.GetConnectionString("CaDemoDb");
+        Guard.Against.Null(connString);
+        this.ConnectionString = connString;
     }
+
+    public string ConnectionString { get; }
 
     public async Task InitialiseAsync()
     {
         var options = new DbContextOptionsBuilder<AppDbContext>()
-            .UseSqlServer(_connectionString)
+            .UseSqlServer(ConnectionString)
             .Options;
 
         var context = new AppDbContext(options);
@@ -35,7 +36,7 @@ public class SqlServerTestDatabase : ITestDatabase
         await context.Database.EnsureDeletedAsync();
         await context.Database.MigrateAsync();
 
-        _respawner = await Respawner.CreateAsync(_connectionString, new RespawnerOptions
+        _respawner = await Respawner.CreateAsync(ConnectionString, new RespawnerOptions
         {
             TablesToIgnore = [
                 "__EFMigrationsHistory",
@@ -52,11 +53,21 @@ public class SqlServerTestDatabase : ITestDatabase
 
     public async Task ResetAsync()
     {
-        await _respawner.ResetAsync(_connectionString);
+        await _respawner.ResetAsync(ConnectionString);
     }
 
     public Task DisposeAsync()
     {
         return Task.CompletedTask;
+    }
+
+    public AppDbContext CreateDbContext()
+    {
+        var options = new DbContextOptionsBuilder<AppDbContext>()
+            .UseSqlServer(ConnectionString)
+            .EnableSensitiveDataLogging()
+            .Options;
+
+        return new AppDbContext(options);
     }
 }
