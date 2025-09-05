@@ -1,7 +1,7 @@
 ﻿namespace Argo.CA.Api.IntegrationTests.Testing.Extensions;
 
 using Domain.Common;
-using FluentAssertions;
+using AwesomeAssertions;
 
 public static class AuditExtensions
 {

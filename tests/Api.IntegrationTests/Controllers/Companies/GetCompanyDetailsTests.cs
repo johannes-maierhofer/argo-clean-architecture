@@ -2,7 +2,7 @@
 
 using System.Net;
 using ApiClients;
-using FluentAssertions;
+using AwesomeAssertions;
 using Testing;
 using Testing.Builders;
 using TestUtils;

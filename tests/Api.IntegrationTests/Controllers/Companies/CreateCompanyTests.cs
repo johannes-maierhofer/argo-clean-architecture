@@ -7,7 +7,7 @@ namespace Argo.CA.Api.IntegrationTests.Controllers.Companies;
 
 using System.Net;
 using ApiClients;
-using FluentAssertions;
+using AwesomeAssertions;
 using Testing;
 using Testing.Constants;
 using Xunit.Abstractions;

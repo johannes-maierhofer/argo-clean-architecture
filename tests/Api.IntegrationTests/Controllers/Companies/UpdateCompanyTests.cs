@@ -1,5 +1,5 @@
 ﻿using Argo.CA.Api.IntegrationTests.Controllers.Companies.TestUtils;
-using FluentAssertions;
+using AwesomeAssertions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Argo.CA.Api.IntegrationTests.Controllers.Companies;

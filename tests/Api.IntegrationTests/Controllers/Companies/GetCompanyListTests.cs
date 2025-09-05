@@ -1,7 +1,7 @@
 ﻿namespace Argo.CA.Api.IntegrationTests.Controllers.Companies;
 
 using Domain.CompanyAggregate;
-using FluentAssertions;
+using AwesomeAssertions;
 using Testing;
 using Testing.Builders;
 using Xunit.Abstractions;

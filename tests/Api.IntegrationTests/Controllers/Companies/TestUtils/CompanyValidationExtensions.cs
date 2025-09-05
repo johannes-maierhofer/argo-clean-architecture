@@ -2,7 +2,7 @@
 
 using ApiClients;
 using Domain.CompanyAggregate;
-using FluentAssertions;
+using AwesomeAssertions;
 
 public static class CompanyValidationExtensions
 {
