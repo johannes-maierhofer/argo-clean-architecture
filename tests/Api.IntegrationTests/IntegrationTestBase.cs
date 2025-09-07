@@ -1,4 +1,6 @@
-﻿namespace Argo.CA.Api.IntegrationTests;
+﻿using Argo.CA.Infrastructure.Persistence;
+
+namespace Argo.CA.Api.IntegrationTests;
 
 using Microsoft.AspNetCore.Mvc.Testing;
 using Testing;
@@ -7,12 +9,10 @@ using Xunit.Abstractions;
 [Collection("IntegrationTests")]
 public abstract class IntegrationTestBase(
     ITestOutputHelper output,
-    CustomWebApplicationFactory factory,
     DatabaseFixture database)
     : IAsyncLifetime, IClassFixture<CustomWebApplicationFactory>
 {
     protected ITestOutputHelper Output { get; } = output;
-    protected WebApplicationFactory<Program> Factory { get; } = factory.WithTestLogging(output);
 
     public async Task InitializeAsync()
     {
@@ -22,19 +22,27 @@ public abstract class IntegrationTestBase(
 
     public async Task DisposeAsync()
     {
-        await Factory.DisposeAsync();
+        await database.DisposeAsync();
     }
+
+    protected WebApplicationFactory<Program> CreateWebAppFactory()
+    {
+        return new CustomWebApplicationFactory(database)
+            .WithTestLogging(Output);
+    }
+
+    protected AppDbContext CreateDbContext() => database.CreateDbContext();
 
     protected async Task AddEntityToDb<T>(T entity) where T : class
     {
-        await using var dbContext = Factory.CreateDbContext();
+        await using var dbContext = database.CreateDbContext();
         await dbContext.Set<T>().AddAsync(entity);
         await dbContext.SaveChangesAsync();
     }
 
     protected async Task AddEntityRangeToDb<T>(IEnumerable<T> entities) where T : class
     {
-        await using var dbContext = Factory.CreateDbContext();
+        await using var dbContext = database.CreateDbContext();
         await dbContext.Set<T>().AddRangeAsync(entities);
         await dbContext.SaveChangesAsync();
     }

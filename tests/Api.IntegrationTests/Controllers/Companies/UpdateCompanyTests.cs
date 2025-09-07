@@ -1,20 +1,20 @@
-﻿namespace Argo.CA.Api.IntegrationTests.Controllers.Companies;
+﻿using Argo.CA.Api.IntegrationTests.Controllers.Companies.TestUtils;
+using AwesomeAssertions;
+using Microsoft.EntityFrameworkCore;
+
+namespace Argo.CA.Api.IntegrationTests.Controllers.Companies;
 
 using System.Net;
 using ApiClients;
-using FluentAssertions;
-using Microsoft.EntityFrameworkCore;
 using Testing;
 using Testing.Builders;
 using Testing.Constants;
-using TestUtils;
 using Xunit.Abstractions;
 
 public class UpdateCompanyTests(
     ITestOutputHelper output,
-    CustomWebApplicationFactory factory,
     DatabaseFixture database)
-    : IntegrationTestBase(output, factory, database)
+    : IntegrationTestBase(output, database)
 {
     [Fact]
     public async Task UpdateCompany_WhenRequestIsValid_ShouldSucceed()
@@ -26,14 +26,15 @@ public class UpdateCompanyTests(
 
         await AddEntityToDb(company);
 
-        var client = Factory.CreateApiClient();
+        await using var factory = CreateWebAppFactory();
+        var client = factory.CreateApiClient();
 
         // Act
         var request = CreateRequest(name: company.Name);
         await client.UpdateCompanyAsync(company.Id, request);
 
         // Assert
-        await using var dbContext = Factory.CreateDbContext();
+        await using var dbContext = CreateDbContext();
         var companyFromDb = await dbContext.Companies.SingleAsync(c => c.Id == company.Id);
         companyFromDb.ValidateUpdatedFrom(request);
     }
@@ -50,9 +51,10 @@ public class UpdateCompanyTests(
             .WithName("Company B")
             .Build();
 
-        await AddEntityRangeToDb(new[] { company, anotherCompany });
+        await AddEntityRangeToDb([company, anotherCompany]);
 
-        var client = Factory.CreateApiClient();
+        await using var factory = CreateWebAppFactory();
+        var client = factory.CreateApiClient();
 
         // Act
         var request = CreateRequest(name: anotherCompany.Name);

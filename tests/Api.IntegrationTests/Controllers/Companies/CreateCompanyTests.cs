@@ -1,28 +1,28 @@
-﻿using Argo.CA.Api.IntegrationTests.Testing.Authentication;
+﻿using Argo.CA.Api.IntegrationTests.Controllers.Companies.TestUtils;
+using Argo.CA.Api.IntegrationTests.Testing.Authentication;
 using Argo.CA.Api.IntegrationTests.Testing.Extensions;
+using Microsoft.EntityFrameworkCore;
 
 namespace Argo.CA.Api.IntegrationTests.Controllers.Companies;
 
 using System.Net;
 using ApiClients;
-using FluentAssertions;
-using Microsoft.EntityFrameworkCore;
+using AwesomeAssertions;
 using Testing;
 using Testing.Constants;
-using TestUtils;
 using Xunit.Abstractions;
 
 public class CreateCompanyTests(
     ITestOutputHelper output,
-    CustomWebApplicationFactory factory,
     DatabaseFixture database)
-    : IntegrationTestBase(output, factory, database)
+    : IntegrationTestBase(output, database)
 {
     [Fact]
     public async Task CreateCompany_WhenRequestIsValid_ShouldSucceed()
     {
         // Arrange
-        var client = Factory.CreateApiClient(b => b.AsAdmin());
+        await using var factory = CreateWebAppFactory();
+        var client = factory.CreateApiClient(b => b.AsAdmin());
         var request = CreateRequest();
 
         // Act
@@ -31,7 +31,7 @@ public class CreateCompanyTests(
         // Assert
         response.Id.Should().NotBeEmpty();
 
-        await using var dbContext = Factory.CreateDbContext();
+        await using var dbContext = CreateDbContext();
 
         var company = await dbContext.Companies.SingleAsync(c => c.Id == response.Id);
         company.ValidateCreatedFrom(request);
@@ -43,10 +43,11 @@ public class CreateCompanyTests(
     public async Task CreateCompany_WithInvalidEmail_ShouldReturnBadRequest()
     {
         // Arrange
-        var client = Factory.CreateApiClient();
-        var request = CreateRequest(email: "not-a-valid-email");
+        await using var factory = CreateWebAppFactory();
+        var client = factory.CreateApiClient();
 
         // Act
+        var request = CreateRequest(email: "not-a-valid-email");
         var action = () => client.CreateCompanyAsync(request);
 
         // Assert
@@ -60,10 +61,11 @@ public class CreateCompanyTests(
     public async Task CreateCompany_WhenUserIsOnlyReader_ShouldReturnForbidden()
     {
         // Arrange
-        var client = Factory.CreateApiClient(b => b.AsReader());
-        var request = CreateRequest();
+        await using var factory = CreateWebAppFactory();
+        var client = factory.CreateApiClient(b => b.AsReader());
 
         // Act
+        var request = CreateRequest();
         var action = () => client.CreateCompanyAsync(request);
 
         // Assert

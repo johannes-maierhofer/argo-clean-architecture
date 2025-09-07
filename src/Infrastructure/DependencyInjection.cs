@@ -6,6 +6,7 @@ using Argo.CA.Application.Common.Security.JwtTokenGeneration;
 using Argo.CA.Application.Common.Security.Policies;
 using Argo.CA.Domain.Common.Events;
 using Argo.CA.Domain.UserAggregate;
+using Argo.CA.Infrastructure.Configuration;
 using Argo.CA.Infrastructure.Logging;
 using Argo.CA.Infrastructure.OpenTelemetry;
 using Argo.CA.Infrastructure.Persistence;
@@ -33,7 +34,7 @@ public static class DependencyInjection
     {
         services
             .AddHttpContextAccessor()
-            .AddPersistence(configuration)
+            .AddPersistence(configuration, environment)
             .AddAuthentication(configuration, environment)
             .AddAuthorization()
             .AddCustomSerilog()
@@ -45,18 +46,26 @@ public static class DependencyInjection
         return services;
     }
 
-    private static IServiceCollection AddPersistence(this IServiceCollection services, IConfiguration configuration)
+    private static IServiceCollection AddPersistence(
+        this IServiceCollection services,
+        IConfiguration configuration,
+        IWebHostEnvironment environment)
     {
-        string? connectionString = configuration.GetConnectionString("CaDemoDb");
-        Guard.Against.Null(connectionString, message: "Connection string 'CaDemoDb' not found.");
-
         services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
         services.AddScoped<ISaveChangesInterceptor, DomainEventDispatchingInterceptor>();
 
         services.AddDbContext<AppDbContext>((sp, options) =>
         {
+            string? connectionString = configuration.GetConnectionString("CaDemoDb");
+            Guard.Against.Null(connectionString, message: "Connection string 'CaDemoDb' not found.");
+
             options.UseSqlServer(connectionString,
                 providerOptions => providerOptions.EnableRetryOnFailure());
+
+            if (environment.IsTesting())
+            {
+                options.EnableSensitiveDataLogging();
+            }
 
             options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
         });

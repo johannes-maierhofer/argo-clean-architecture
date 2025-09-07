@@ -1,10 +1,14 @@
-﻿namespace Argo.CA.Api.IntegrationTests.Testing;
+﻿using Argo.CA.Infrastructure.Persistence;
+
+namespace Argo.CA.Api.IntegrationTests.Testing;
 
 using Database;
 
 public class DatabaseFixture : IAsyncLifetime
 {
-    private readonly ITestDatabase _database = new SqlServerTestDatabase();
+    private readonly ITestDatabase _database = new TestContainersTestDatabase();
+
+    public string ConnectionString => _database.ConnectionString;
 
     public async Task InitializeAsync()
     {
@@ -19,5 +23,10 @@ public class DatabaseFixture : IAsyncLifetime
     public async Task DisposeAsync()
     {
         await _database.DisposeAsync();
+    }
+
+    public AppDbContext CreateDbContext()
+    {
+        return _database.CreateDbContext();
     }
 }
