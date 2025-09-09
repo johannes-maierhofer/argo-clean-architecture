@@ -12,6 +12,7 @@ Clean architecture demo application with
     - From Visual Studio (Debug mode): make sure docker-compose is set as startup project, then simply press F5.
     - Or run the following command on terminal at the root of the project: ```docker-compose up -d```
 3. In Docker Desktop you will be able to see the containers.
+4. Api will be available under https://localhost:51232/swagger/index.html
 
 ## Technologies
 - ✔️ **[`.NET 9`](https://dotnet.microsoft.com/download)** - .NET Framework and .NET Core, including ASP.NET and ASP.NET Core
